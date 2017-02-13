@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+</head>
+<body>
+<font face="Verdana" size="4">Бронирование отеля</font>
+<div id="all">
+				<h4>Show Rooms</h4>
+				<ul id="rooms_all"></ul>
+			</div>
+<button id="show">Show Room</button>
+<script>
+
+    $(document).ready(function(){
+    	
+    		function getParameterByName(name, url) {
+    		    if (!url) url = window.location.href;
+    		    name = name.replace(/[\[\]]/g, "\\$&");
+    		    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+    		        results = regex.exec(url);
+    		    if (!results) return null;
+    		    if (!results[2]) return '';
+    		    return decodeURIComponent(results[2].replace(/\+/g, " "));
+    		}
+    		var id = getParameterByName('id');
+    		var ar = getParameterByName('ar');
+    		var dep = getParameterByName('dep');
+    		
+    		$('button').on('click', function(){
+    			getRoom();
+    	    });
+    		
+    		function getRoom()
+            {
+    		
+    		$.ajax({ 
+            	type: 'GET',
+            	url: 'http://localhost:8080/choosehotels-web/rest/restsearchResults2',
+            	dataType: 'json',
+            	data: {"id": id},
+            	beforeSend: function(data) { 
+            		alert("id= " + id);
+            		alert("data= " + data);
+            		
+    	          },
+    	        headers: {
+    	                'Content-Type': 'application/json'
+    	            },
+    	        success: function(data){ 
+    		       			alert('Все прошло хорошо'); 
+    		       			$('#rooms_all').empty();
+    		               
+    		                	var info = '<li>Name: ' + data.description + ' ' + data.price + ' ' + '</li>';
+
+    		                	$('#rooms_all').append(info);
+    		                
+    		         }, 
+    		    
+    		     error: function (data) { 
+    			         alert('Произошла ошибка сервера'); 
+    			         
+    			         },
+    			         
+            	}); 
+        } 
+      
+        
+    		$('form').on('submit', function(e){
+    	        e.preventDefault();
+
+    	        var form = $(this);
+    	        var error = false;
+    	        
+    	        form.find('input').each( function(){ 
+    				if ($(this).val() == '') { 
+    					alert('Зaпoлнитe пoлe "'+$(this).attr('placeholder')+'"!'); 
+    					error = true; 
+    				}
+    			});
+    	        
+    	        if (!error) 
+    	        {
+    	        	var contactName = $("#contactName").val();
+    	        	var surname = $("#surname").val();
+    	        	var address = $("#address").val();
+    	        	var email = $("#email").val();
+    	        	var ccNumber = $("#CCNumber").val();
+    	        	var roomId = getParameterByName('id');
+    	    		var arr = getParameterByName('ar');
+    	    		var depat = getParameterByName('dep');
+    	        	
+    	            var order = JSON.stringify({"contactName": contactName, "surname": surname, "address": address, "email": email, "arr": arr, "depat": depat, "roomId": roomId, "ccNumber": ccNumber});
+    	            
+    	            alert("order= " + order);
+    	            
+    	        	$.ajax({ 
+    	        	type: 'POST',
+    	        	url: 'http://localhost:8080/choosehotels-web/rest/reservation',
+    	        	dataType: 'json',
+    	        	data: order,
+    	        	
+    		        headers: {
+    		                'Content-Type': 'application/json'
+    		            },
+    		        success: function(data){ 
+    			       		
+    			         }, 
+    			    
+    			     error: function (data) { 
+    				         alert('Заказ успешно принят! Номер заказа выслан Вам на почту'); // пoкaжeм oтвeт сeрвeрa
+    				         
+    				         },
+    				         
+    	        	}); 
+    	        	} 
+    	        	return false; 
+    	        
+    	    		}); 
+    	    		
+    	    	function clearInputs(){
+    				$("#hotelName").val('');
+    				$("#arrival").val('');
+    				$("#departure").val('');
+    				$("#number_of_rooms").val('');
+    				$("#number_of_persons").val('');
+    				}
+    	    	
+    	    	
+        
+        
+        });
+        
+            
+        
+</script>
+
+
+<form method="post" action="" >
+
+                    <table width="450" cellpadding="5" cellspacing="0" border="0">
+                        <tr>
+                            <td bgcolor="F6F6F6">
+                            <!-- <font face="Verdana" size="4">Бронирование отеля</font>-->
+                            </td>
+                                
+                        <tr>
+                            <td> 
+                            <font face="Verdana">Имя</font>
+                            </td>
+                            <td> 
+                            <font face="Verdana">Фамилия</font>
+                            </td>
+                        </tr>            
+                        <tr>
+                            <td>
+                                <input type="text" id="contactName" name="contactName" placeholder="Имя" size="30" />
+                            </td>
+                            <td>
+                                <input type="text" id="surname" name="surname" placeholder="Фамилия" size="30" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td> 
+                            <font face="Verdana">Адрес</font>
+                            </td>
+                            <td> 
+                            <font face="Verdana">Электронная почта</font>
+                            </td>
+                        </tr>  
+                         <tr>
+                            <td>
+                                <input type="text" id="address" name="address" placeholder="Адрес" size="30" />
+                            </td>
+                            <td>
+                                <input type="text" id="email" name="email" placeholder="e-mail" size="30" />
+                            </td>
+                        </tr>   
+                        <tr>
+                            <td> 
+                            <font face="Verdana">CCNumber</font>
+                            
+                        </tr>    
+                        <tr>
+                            <td>
+                                <input type="text" id="CCNumber" name="CCNumber" placeholder="CCNumber" size="30" />
+                            </td>
+                            </td>
+                            
+                        </tr>       
+                        <tr>
+                            <td colspan="2" align="right">
+                                <input type="submit" value="Забронировать" />
+                            </td> 
+                    </table>
+                <form>
+
+
+</body>
+</html>

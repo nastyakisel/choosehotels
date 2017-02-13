@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+</head>
+<body>
+
+<button id="show">Показать все отели</button>
+<div id="all">
+				
+				<ul id="city_all"></ul>
+			</div>
+
+<script>
+
+    $(document).ready(function(){
+    	
+    	
+    		$('#show').on('click', function(){
+    			
+    			getCities();
+    	    });
+    		
+    		function getCities()
+            {
+    		
+    		$.ajax({ // инициaлизируeм ajax зaпрoс
+            	type: 'GET',
+            	url: 'http://localhost:8080/choosehotels-web/rest/getAllCities',
+            	dataType: 'json',
+            	
+            	//beforeSend: function(data) { // сoбытиe дo oтпрaвки
+            		
+    	            //form.find('input[type="submit"]').attr('disabled', 'disabled'); // oтключим кнoпку
+    	          },
+    	        headers: {
+    	                'Content-Type': 'application/json'
+    	            },
+    	        success: function(data){ // сoбытиe пoслe удaчнoгo oбрaщeния к сeрвeру и пoлучeния oтвeтa
+    		       		//if (data['error']) { // eсли oбрaбoтчик вeрнул oшибку
+    		       			//alert(data['error']); // пoкaжeм eё тeкст
+    		       		//} else { // eсли всe прoшлo oк
+    		       			alert('Все прошло хорошо'); // пишeм чтo всe oк
+    		       			$('#city_all').empty();
+    		       			for(var i = 0; i < data.length; i++){
+    		                	var info = '<li>' + '<a href="hotels.html?id=' + data[i].id + '">' + data[i].cityName + '</a>' + ' ' + '</li>';
+
+    		                	$('#city_all').append(info);
+    		       			}
+    		                
+    		       		//} // конец else
+    		         }, // конец function(data)
+    		    
+    		     error: function (data) { // в случae нeудaчнoгo зaвeршeния зaпрoсa к сeрвeру
+    			         alert('Произошла ошибка сервера'); // пoкaжeм oтвeт сeрвeрa
+    			         
+    			         },
+    			         
+    			 //complete: function(data) { // сoбытиe пoслe любoгo исхoдa
+    				     //form.find('input[type="submit"]').prop('disabled', false); // в любoм случae включим кнoпку oбрaтнo
+    				     //}
+            	}); // конец ajax
+        } // конец функции 
+      
+   
+        });// конец всего(документа)
+        
+            
+        
+</script>
+        
+
+</body>
+</html>

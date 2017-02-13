@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Choose hotels service</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<link type="text/css" href="css/style.css" rel="stylesheet" />
+</head>
+<body>
+
+<div class="menu_wrapper">
+<header class="topper">
+				<h2>Поиск отелей</h2>
+				
+			</header>
+<div class="left_col">
+<form class="form" method="post" action="">
+
+                    <table width="250" cellpadding="5" cellspacing="0" border="0">
+                        <tr>
+                        </tr>
+                        <tr>
+                            <td bgcolor="F6F6F6" > 
+                            <font face="Verdana">Введите название отеля</font>
+                            </td>
+                        </tr>            
+                        <tr>
+                            <td>
+                                <input type="hidden" name="action" value="search" />
+                                <input type="text" id="hotelName" name="hotelName" placeholder="Название отеля" size="30" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Дата прибытия</td>
+                        </tr> 
+                        <tr>
+                            <td>
+                            <input type="date" id="arrival" name="arrival" min="2016-03-01" max="2017-03-01"/>
+                            
+                            </td>
+                        </tr> 
+                        <tr>
+                            <td>Дата отъезда</td>
+                        </tr> 
+                        <tr>
+                            <td>
+                            <input type="date" id="departure" name="departure" min="2016-03-01" max="2017-03-01"/>
+                            </td>
+                        </tr> 
+                        <tr>
+                            <td>Количество номеров
+                            <select id="number_of_rooms" name="number_of_rooms">
+                            <option value =1>1</option>
+                            <option value =2>2</option>
+                            <option value =3>3</option>
+                            <option value =4>4</option>
+                            <option value =5>5</option>
+                            <option value =6>6</option>
+                            <option value =7>7</option>
+                            <option value =8>8</option>
+                            <option value =9>9</option>
+                            <option value =10>10</option>
+                            </select>
+                            </td>
+                            
+                            <td>Количество человек
+                            <select id="number_of_persons" name="number_of_persons">
+                            <option value =1>1</option>
+                            <option value =2>2</option>
+                            <option value =3>3</option>
+                            <option value =4>4</option>
+                            <option value =5>5</option>
+                            <option value =6>6</option>
+                            <option value =7>7</option>
+                            <option value =8>8</option>
+                            <option value =9>9</option>
+                            <option value =10>10</option>
+                            </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="right">
+                                <input type="submit" value="Искать" />
+                            </td> 
+                    </table>
+                </form>
+<div id="all">
+				<h4></h4>
+				<ul id="rooms_all"></ul>
+			</div>
+
+</div>
+
+<div class="right_col">
+
+<button id="show">Показать все отели</button>
+<div id="all">
+				
+				<ul id="city_all"></ul>
+			</div>
+</div>
+
+<footer class="bottom">
+				<h5>Address</h5>
+			</footer>
+
+<script>
+
+    $(document).ready(function(){
+    
+        
+    $('form').on('submit', function(e){
+        e.preventDefault();
+
+        var form = $(this);
+        var error = false;
+        
+        form.find('input').each( function(){ 
+			if ($(this).val() == '') { 
+				alert('Зaпoлнитe пoлe "'+$(this).attr('placeholder')+'"!');
+				error = true; 
+			}
+		});
+        
+        if (!error) 
+        {
+        	var hotelName = $("#hotelName").val();
+        	var arrival = $("#arrival").val();
+        	var departure = $("#departure").val();
+        	var numberOfRooms = $("#number_of_rooms").val();
+        	var numberOfPersons = $("#number_of_persons").val();
+        	
+        	
+            var hotel = JSON.stringify({"hotelName": hotelName, "arrival": arrival, "departure": departure, "numberOfRooms": numberOfRooms, "numberOfPersons": numberOfPersons});
+            
+        	$.ajax({ 
+        	type: 'POST',
+        	url: 'http://localhost:8080/choosehotels-web/rest/restsearchResults',
+        	dataType: 'json',
+        	data: hotel,
+        	
+	        headers: {
+	                'Content-Type': 'application/json'
+	            },
+	        success: function(data){ 
+		       	
+		       			$('#rooms_all').empty();
+		                for(var i = 0; i < data.length; i++){
+		                	var info = '<li>Комната: ' + data[i].description + ' ' + 'Цена: ' + data[i].price + ' ' + '<a href="reservation.html?id=' + data[i].id + '&ar=' +arrival+ '&dep=' +departure+ '">Забронировать</a>' + '</li>';
+
+		                	$('#rooms_all').append(info);
+		                }
+		         }, 
+		    
+		     error: function (data) { 
+			         alert('Комнаты не найдены!'); 
+			         
+			         },
+			         
+        	}); 
+        	} 
+        	return false; 
+        
+    		}); 
+    		
+    	function clearInputs(){
+			$("#hotelName").val('');
+			$("#arrival").val('');
+			$("#departure").val('');
+			$("#number_of_rooms").val('');
+			$("#number_of_persons").val('');
+			}
+    	
+    	$('#show').on('click', function(){
+			
+			getCities();
+	    });
+		
+		function getCities()
+        {
+		
+		$.ajax({ 
+        	type: 'GET',
+        	url: 'http://localhost:8080/choosehotels-web/rest/getAllCities',
+        	dataType: 'json',    
+	        headers: {
+	                'Content-Type': 'application/json'
+	            },
+	        success: function(data){ 
+		       		
+		       			alert('Все прошло хорошо'); 
+		       			$('#city_all').empty();
+		       			for(var i = 0; i < data.length; i++){
+		                	var info = '<li>' + '<a href="hotels.html?id=' + data[i].id + '">' + data[i].cityName + '</a>' + ' ' + '</li>';
+
+		                	$('#city_all').append(info);
+		       			}          
+		         },     
+		     error: function (data) { 
+			         alert('Произошла ошибка сервера'); 
+			         
+			         },
+        	}); 
+    } 
+    		
+        });
+        
+</script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns="http://www.springframework.org/schema/security"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd 
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd">
+
+	<http auto-config="true" use-expressions="true">
+		<intercept-url pattern="/private/**" access="isAuthenticated()" />
+		<csrf disabled="true" />
+		<!--  <form-login login-page="/WEB-INF/pages/loginPage.jsp"/>-->
+	</http>
+
+	<!--<user-service id="userService">
+	    <user name="admin" password="admin" authorities="ROLE_ADMIN"/>
+	    
+	</user-service>-->
+
+	<jdbc-user-service id="userService"
+ 	data-source-ref="dataSource"
+ 	users-by-username-query="select email, password, true from visitor where email=?"
+ 	authorities-by-username-query="select email, 'ROLE_VISITOR' from visitor where email=?" />
+	
+	
+	<authentication-manager>
+		<authentication-provider user-service-ref="userService" />
+	</authentication-manager>
+
+</beans:beans>
